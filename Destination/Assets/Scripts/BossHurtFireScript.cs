@@ -180,7 +180,7 @@ public class BossHurtFireScript : MonoBehaviour
             //Vector2(shotSpawn.TransformVector)
             float angle = GetAngle(shotSpawn.transform.position, GetActiveBoss().transform.position);
             //Debug.Log("Spike Trigger " +activeBoss + "  " + angle);
-            CreateShot(pos, angle, 1f, GetEnumColor(bgController.GetColor()));
+            CreateShot(pos, angle, 13f, GetEnumColor(bgController.GetColor()));
             //CreateShot(pos, angle, 1f, BackgroundHolder.BgColor);
         }
 

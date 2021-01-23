@@ -119,6 +119,7 @@ public class NewEnemyBulletScript : QuickMaths
     public int poolStartSize;
     public int poolPointer = 0;
     private float rot = 90.0f; //temp
+    public GameObject player;
     // private string[] colors = { "grey", "red", "blue", "purple", "yellow" };
 
     private void Start()
@@ -247,9 +248,26 @@ public class NewEnemyBulletScript : QuickMaths
 
             newShot.obj.SetActive(true);
             newShot.obj.transform.position = startPosition;
-
-          
+            
             SetVelocity(newShot.id, rotation, speed/2);
+
+            SetColor(bullets[newShot.id], color);
+
+            return newShot.id;
+        }
+        return -1;
+    }
+
+    public int CreateShot(Vector2 startPosition, float speed, bulletColor color)
+        //If no rotation angle passed Assume aim at player
+    {
+        if (MovePointer())
+        {
+            Bullet newShot = GetBullet(poolPointer);
+
+            newShot.obj.SetActive(true);
+            newShot.obj.transform.position = startPosition;
+            SetVelocity(newShot.id, GetAngle(startPosition, player.transform.position), speed / 2);
 
             SetColor(bullets[newShot.id], color);
 

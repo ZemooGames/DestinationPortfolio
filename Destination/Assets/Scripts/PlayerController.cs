@@ -5,10 +5,12 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     public float playerSpeed = 3.0f;
-    static float leftPlayerBoundary = 0.5f;
-    static float rightPlayerBoundary = 7.5f;
-    static float topPlayerBoundary= -0.5f;
-    static float bottomPlayerBoundary = -5.5f;
+    public float playerFocusSpeed = 1.5f;
+    private Vector3 movement;
+    static float leftPlayerBoundary = 0.41f;
+    static float rightPlayerBoundary = 7.59f;
+    static float topPlayerBoundary= -0.390f;
+    static float bottomPlayerBoundary = -5.59f;
 
     public GameObject shot;
     public Transform shotSpawn;
@@ -26,13 +28,16 @@ public class PlayerController : MonoBehaviour {
     public bool invincible;
     private bool gameOver;
     public Vector3 startPosition;
+    //private Color spritecolor;
+    //private 
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<Sprite>();
         spRend = GetComponent<SpriteRenderer>();
+        //spritecolor = spRend.color;
         fireType = PlayerPrefs.GetString("FireType","turbo");//make this access the options later
         lives = PlayerPrefs.GetInt("StartingLives", 3);//make this accessable later
         gameOver = false;
@@ -49,7 +54,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (gameOver)
         {
-
+            rb.velocity = new Vector3(0.0f,0.0f,0.0f);
         }else{
             PlayerMovement();
             PlayerVisuals();
@@ -61,15 +66,42 @@ public class PlayerController : MonoBehaviour {
         float horizontalSpeed = Input.GetAxis("Horizontal");
         float verticalSpeed = Input.GetAxis("Vertical");
 
-        Vector3 movement = new Vector3(horizontalSpeed * playerSpeed, verticalSpeed * playerSpeed, 0.0f);
+        if (Input.GetAxis("Fire2") > 0.5f)//Focus Movement
+        {
+            movement = new Vector3(horizontalSpeed * playerFocusSpeed, verticalSpeed * playerFocusSpeed, 0.0f);
+        }
+        else
+        {
+            movement = new Vector3(horizontalSpeed * playerSpeed, verticalSpeed * playerSpeed, 0.0f);
+        }
+        
+        if (rb.position.x < leftPlayerBoundary)
+        {
+            movement.x = Mathf.Max(movement.x, 0);
+        }else if(rb.position.x > rightPlayerBoundary)
+        {
+            movement.x = Mathf.Min(movement.x, 0);
+        }
+        if (rb.position.y < bottomPlayerBoundary)
+        {
+            movement.y = Mathf.Max(movement.y, 0);
+        }
+        else if (rb.position.y > topPlayerBoundary)
+        {
+            movement.y = Mathf.Min(movement.y, 0);
+        }
+
         rb.velocity = movement;
 
-        rb.position = new Vector3
+       /* 
+        * //More elegant looking code, but player slides back off the wall
+        *
+         rb.position = new Vector3
             (
             Mathf.Clamp(rb.position.x, leftPlayerBoundary, rightPlayerBoundary),
             Mathf.Clamp(rb.position.y, bottomPlayerBoundary, topPlayerBoundary),
             0.0f
-            );
+            );*/
     }
 
     void FireBullet()
@@ -126,7 +158,7 @@ public class PlayerController : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("trigger");
+        //Debug.Log("Player collide with other");
             if (other.tag == "PlayerKiller")
             {
                 if (!invincible)

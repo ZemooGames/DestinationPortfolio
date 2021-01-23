@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BackgroundController : MonoBehaviour {
+public class BackgroundController : QuickMaths {
     enum color
     {
         grey,
@@ -28,11 +28,16 @@ public class BackgroundController : MonoBehaviour {
     public BossHealthBar BossYellow;
     private int purpleAngle;
     private int purpleAngle2;//check if these angles are the in order
+    private Vector2 purpleCorner = new Vector2(0.16f, 0.16f);
+    private Vector2 purpleCorner2 = new Vector2(7.84f, 0.16f);
     private int[] purpleAdd = { 6, 10, 15, 20 };
     private int[] purpleAdd2 = { 5, 11, 16, 22 };
+    private float yellowAngle;
+    static float leftYellowBoundary = 0.41f;
+    static float rightYellowBoundary = 7.59f;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         anims = GetComponentsInChildren<Animator>();
         BossPos = BossMain.transform.position;
 	}
@@ -56,6 +61,7 @@ public class BackgroundController : MonoBehaviour {
                     BlueRoutine();
                     break;
                 case "yellow":
+                    YellowRoutine();
                     break;
                 case "purple":
                     PurpleRoutine();
@@ -130,11 +136,10 @@ public class BackgroundController : MonoBehaviour {
                 purpleAngle += 15;
                 if (frame % 25 == 0)
                 {
-                    Vector2 origin = new Vector2(0.16f, 0.16f);
-                    Vector2 origin2 = new Vector2(7.84f, 0.16f);
+                    
                     //Debug.Log("PURPLE RUT " + shooter.GetEnumColor("purple"));
-                    shooter.CreateShot(origin, shooter.GetAngle(origin, player.transform.position), 6, shooter.GetEnumColor("purple"));
-                    shooter.CreateShot(origin2, shooter.GetAngle(origin2, player.transform.position), 6, shooter.GetEnumColor("purple"));
+                    shooter.CreateShot(purpleCorner, shooter.GetAngle(purpleCorner, player.transform.position), 6, shooter.GetEnumColor("purple"));
+                    shooter.CreateShot(purpleCorner2, shooter.GetAngle(purpleCorner2, player.transform.position), 6, shooter.GetEnumColor("purple"));
                 }
             }
         }else
@@ -157,14 +162,28 @@ public class BackgroundController : MonoBehaviour {
         if(frame % 30 == 0)
         {
             
-            //int num = shooter.CreateShot(BossPos, shooter.GetAngle(BossPos, player.transform.position), 5, shooter.GetEnumColor("blue"));
-            //shooter.SetScale(num,2.0f);
+            int num = shooter.CreateShot(BossPos, shooter.GetAngle(BossPos, player.transform.position), 5, shooter.GetEnumColor("blue"));
+            shooter.SetScale(num,2.0f);
         }
     }
 
     public void YellowRoutine()
     {
-        shooter.CreateBoundShot(MouthPos, 48, 6, shooter.GetEnumColor("yellow"));
+        if(frame % 60 == 0)
+        {
+            
+           yellowAngle = shooter.GetAngle(MouthPos, player.transform.position);
+            for (int i = 0; i < 6; i++)
+            {
+                shooter.CreateShot(MouthPos, yellowAngle, 6, shooter.GetEnumColor("yellow"));
+                yellowAngle += 60;
+            }
+        }
+        if( frame % 30 == 0)
+        {
+            shooter.CreateShot(new Vector2(Random.Range(leftYellowBoundary, rightYellowBoundary),0), 270.0f, 4, shooter.GetEnumColor("yellow"));
+        }
+        //shooter.CreateBoundShot(MouthPos, 48, 6, shooter.GetEnumColor("yellow"));
     }
 
     public string GetColor()
